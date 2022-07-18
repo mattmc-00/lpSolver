@@ -146,9 +146,76 @@ def primal_simplex(a, b, c, B, N):
         N.remove(j)
 
 
+def dual_simplex(a, b, c, B, N):
+    return_dict = {
+        "result": ""
+    }
+    n_plus_m = len(N) + len(B)
+    b_vect = reshape_v(b)
+
+    z = [fr.Fraction(0, 1)] * n_plus_m
+    c_vect = reshape_v(c)
+    v = gauss(np.transpose(a[:, B]), c_vect[B])
+    z_n = np.transpose(a[:, N]).dot(v) - c[N]
+    for k in range(len(N)):
+        z[N[k]] = z_n[k]
+
+    if min(z) < 0:
+        return_dict["result"] = "infeasible"
+
+    # start loop
+    x = [fr.Fraction(0, 1)] * n_plus_m
+    x_b = gauss(a[:, B], b_vect)
+    for k in range(len(B)):
+        x[B[k]] = x_b[k]
+
+    for k in B:
+        if x[k] < 0:
+            break
+        if k == B[-1]:
+            return_dict["result"] = "optimal"
+            # I have no idea what the return value is, maybe z
+            return_dict["solutions"] = z
+            return return_dict
+
+    # pivot rule: bland
+    for k in B:
+        if x[k] < 0:
+            i = k
+            break
+    u_list = [fr.Fraction(0, 1)] * len(B)
+    u_list[B.index(i)] = fr.Fraction(1, 1)
+
+    u = reshape_v(np.array(u_list))
+    delta_z = [fr.Fraction(0, 1)] * n_plus_m
+    v = gauss(np.transpose(a[:, B]), u)
+    delta_z_n = (-1 * np.transpose(a[:, N])).dot(v)
+    for k in range(len(N)):
+        delta_z[N[k]] = delta_z_n[k]
+
+    s_list = []
+    for j in N:
+        if delta_z[j] > 0:
+            s_list.append(z[j] / delta_z[j])
+    if len(s_list) == 0:
+        # d unbounded, implies the primal problem is infeasible
+        return_dict["result"] = "unbounded"
+        return return_dict
+
+    s = min(s_list)
+    for k in N:
+        if delta_z[k] > 0:
+            if (z[k] / delta_z[k]) == s:
+                j = k
+
+
 def main():
     # file_path = "test_LPs_volume1/input/445k22_A1_juice.txt"
-    file_path = "test_LPs_volume1/input/445k22_Lecture01_bakery.txt"
+    # file_path = "test_LPs_volume1/input/445k22_Lecture01_bakery.txt"
+    # file_path = "test_LPs_volume1/input/netlib_adlittle.txt"
+    # file_path = "test_LPs_volume1/input/netlib_afiro.txt"
+    # file_path = "test_LPs_volume1/input/netlib_bgprtr.txt"
+    file_path = "test_LPs_volume1/input/netlib_itest2.txt"
     with open(file_path) as input_file:
         input_data = input_file.read()
     input_list = []
@@ -186,9 +253,15 @@ def main():
         else:
             B.append(i)
 
-    
-    sol = primal_simplex(a, b, c, B, N)
+    if min(b) >= 0:
+        sol = primal_simplex(a, b, c, B, N)
+    elif max(c) <= 0:
+        print("dual time")
+        dual_simplex(a, b, c, B, N)
+    else:
+        print("not ready")
 
+    return 0
     if sol["result"] == "infeasible":
         print(sol["result"])
     elif sol["result"] == "unbounded":
