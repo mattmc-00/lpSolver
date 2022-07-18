@@ -1,6 +1,8 @@
 # CSC 445 Programming Project - Matthew McLean
 # If for some reason there are any problems with my file submitted, please pull my code from https://github.com/mattmc-00/lpSolver
 
+
+
 How to run the solver:
 
 In the lpSolver directory, run the following command:
@@ -21,4 +23,11 @@ This implementation of a linear program solver includes the following features:
     - Guassian elimination with partial pivoting is used to solve systems of linear equations in place of computing matrix inverses
 - It only has functionality for using Bland's rule for pivot selections
     - Bland's rule was selected for its simplicity and cycle avoidance
-- Computations are done with the 'fractions' module objects for numerical accuracy
+
+
+
+The following python modules are used:
+- numpy
+- fractions
+- bisect
+- sys
