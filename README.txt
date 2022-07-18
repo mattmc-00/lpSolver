@@ -1,4 +1,5 @@
 # CSC 445 Programming Project - Matthew McLean
+# If for some reason there are any problems with my file submitted, please pull my code from https://github.com/mattmc-00/lpSolver
 
 How to run the solver:
 
