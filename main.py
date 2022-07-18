@@ -1,29 +1,7 @@
 import numpy as np
 import fractions as fr
 import bisect as bi
-
-
-def print_m(m_a):
-    row = len(m_a[:, 0])
-    col = len(m_a[0, :])
-    print("A = [")
-    for i in range(row):
-        row_list = []
-        for j in range(col):
-            row_list.append(str(m_a[i, j]))
-        to_print = ",\t".join(row_list)
-        print("\t" + to_print)
-    print("]")
-
-
-def print_v(v_a):
-    print("V = [")
-    v_list = []
-    for v in v_a:
-        v_list.append(str(v))
-    to_print = ",\t".join(v_list)
-    print("\t" + to_print)
-    print("]")
+import sys
 
 
 def i_matrix_list(n):
@@ -34,6 +12,12 @@ def i_matrix_list(n):
         identity_row[i] = fr.Fraction(1, 1)
         identity_m.append(identity_row)
     return identity_m
+
+
+def reshape_v(v):
+    v_len = len(v)
+    v_reshaped = v.reshape(v_len, 1)
+    return v_reshaped
 
 
 def gauss(m_a, v_a):
@@ -66,12 +50,6 @@ def gauss(m_a, v_a):
         solutions[k] = sol / aug_a[k, k]
 
     return np.array(solutions)
-
-
-def reshape_v(v):
-    v_len = len(v)
-    v_reshaped = v.reshape(v_len, 1)
-    return v_reshaped
 
 
 def primal_simplex(a, b, c, B, N):
@@ -147,7 +125,6 @@ def primal_simplex(a, b, c, B, N):
         B.remove(i)
         bi.insort(N, i)
         N.remove(j)
-        print(B)
 
 
 def dual_simplex(a, b, c, B, N):
@@ -189,9 +166,6 @@ def dual_simplex(a, b, c, B, N):
                 return_dict["non-basis"] = N
                 return return_dict
 
-        # x_b_vect = reshape_v(x_b)
-        # i = x.index(min(x_b_vect))
-
         u_list = [fr.Fraction(0, 1)] * len(B)
         u_list[B.index(i)] = fr.Fraction(1, 1)
         u = reshape_v(np.array(u_list))
@@ -231,46 +205,6 @@ def dual_simplex(a, b, c, B, N):
         B.remove(i)
         bi.insort(N, i)
         N.remove(j)
-        print(B)
-
-
-def main():
-    files = [
-        "test_LPs_volume1/input/445k22_A1_juice.txt",
-        "test_LPs_volume1/input/445k22_Lecture01_bakery.txt",
-        # "test_LPs_volume1/input/netlib_adlittle.txt",
-        # "test_LPs_volume1/input/netlib_afiro.txt",
-        # "test_LPs_volume1/input/netlib_bgprtr.txt",
-        # "test_LPs_volume1/input/netlib_itest2.txt",
-        # "test_LPs_volume1/input/netlib_itest6.txt",
-        # "test_LPs_volume1/input/netlib_klein1.txt",
-        # "test_LPs_volume1/input/netlib_klein2.txt",
-        # "test_LPs_volume1/input/netlib_sc50a.txt",
-        # "test_LPs_volume1/input/netlib_sc50b.txt",
-        # "test_LPs_volume1/input/netlib_sc105.txt",
-        # "test_LPs_volume1/input/netlib_scagr7.txt",
-        # "test_LPs_volume1/input/netlib_share1b.txt",
-        # "test_LPs_volume1/input/netlib_share2b.txt",
-        # "test_LPs_volume1/input/netlib_stocfor1.txt",
-        "test_LPs_volume1/input/vanderbei_example2.1.txt",
-        "test_LPs_volume1/input/vanderbei_example3.6.txt",
-        "test_LPs_volume1/input/vanderbei_example5.6.txt",
-        "test_LPs_volume1/input/vanderbei_example6.3.txt",
-        "test_LPs_volume1/input/vanderbei_example14.1.txt",
-        "test_LPs_volume1/input/vanderbei_exercise2.1.txt",
-        "test_LPs_volume1/input/vanderbei_exercise2.2.txt",
-        "test_LPs_volume1/input/vanderbei_exercise2.3.txt",
-        "test_LPs_volume1/input/vanderbei_exercise2.4.txt",
-        "test_LPs_volume1/input/vanderbei_exercise2.5.txt",
-        "test_LPs_volume1/input/vanderbei_exercise2.6.txt",
-        "test_LPs_volume1/input/vanderbei_exercise2.7.txt",
-        "test_LPs_volume1/input/vanderbei_exercise2.8.txt",
-        "test_LPs_volume1/input/vanderbei_exercise2.9.txt",
-        "test_LPs_volume1/input/vanderbei_exercise2.10.txt",
-        "test_LPs_volume1/input/vanderbei_exercise2.11.txt",
-    ]
-    for file_name in files:
-        simplex_solver(file_name)
 
 
 def simplex_solver(file_path):
@@ -313,15 +247,12 @@ def simplex_solver(file_path):
 
     if min(b) >= 0:
         # Primal feasible
-        print("primal")
         sol = primal_simplex(a, b, c, B, N)
     elif max(c) <= 0:
         # Dual feasible
-        print("dual")
         sol = dual_simplex(a, b, c, B, N)
     else:
         # Neither primal nor dual feasible
-        print("neither")
         zeros_list = [fr.Fraction(0, 1)] * len(c)
         zeros = reshape_v(np.array(zeros_list))
         aux_sol = dual_simplex(a, b, zeros, B, N)
@@ -348,17 +279,127 @@ def simplex_solver(file_path):
         optimum = 0
         for i in range(variables):
             value = sol["solutions"][i]
-            if value == fr.Fraction(0, 1):
-                formatted = "0"
+            if value.denominator == 1:
+                formatted = str(int(value))
             else:
                 float_value = float(value)
                 formatted = f'{float_value:.7}'
             solutions.append(formatted)
             optimum = optimum + (value * c[i])
-        float_optimum = float(optimum)
-        formatted_optimum = f'{float_optimum:.7}'
+
+        if optimum.denominator == 1:
+            formatted_optimum = str(int(optimum))
+        else:
+            float_optimum = float(optimum)
+            formatted_optimum = f'{float_optimum:.7}'
         print(formatted_optimum)
         print(" ".join(solutions))
+
+
+def main():
+    '''
+    You can run this script on the 2 volumes of sample LPs, or enter the
+    path to an LP as an argument when running this script.
+
+    As this solution is not the most efficient, I've commented out
+    some of the slower problems in volume 1. Simply uncomment whichever LPs
+    you'd like to solve.
+    '''
+
+    if len(sys.argv) > 1:
+        for i in range(1, len(sys.argv)):
+            simplex_solver(sys.argv[i])
+    else:
+        files_v1 = [
+            "test_LPs_volume1/input/445k22_A1_juice.txt",
+            "test_LPs_volume1/input/445k22_Lecture01_bakery.txt",
+            # "test_LPs_volume1/input/netlib_adlittle.txt",
+            # "test_LPs_volume1/input/netlib_afiro.txt",
+            # "test_LPs_volume1/input/netlib_bgprtr.txt",
+            # "test_LPs_volume1/input/netlib_itest2.txt",
+            # "test_LPs_volume1/input/netlib_itest6.txt",
+            # "test_LPs_volume1/input/netlib_klein1.txt",
+            # "test_LPs_volume1/input/netlib_klein2.txt",
+            # "test_LPs_volume1/input/netlib_sc50a.txt",
+            # "test_LPs_volume1/input/netlib_sc50b.txt",
+            # "test_LPs_volume1/input/netlib_sc105.txt",
+            # "test_LPs_volume1/input/netlib_scagr7.txt",
+            # "test_LPs_volume1/input/netlib_share1b.txt",
+            # "test_LPs_volume1/input/netlib_share2b.txt",
+            # "test_LPs_volume1/input/netlib_stocfor1.txt",
+            "test_LPs_volume1/input/vanderbei_example2.1.txt",
+            "test_LPs_volume1/input/vanderbei_example3.6.txt",
+            "test_LPs_volume1/input/vanderbei_example5.6.txt",
+            "test_LPs_volume1/input/vanderbei_example6.3.txt",
+            "test_LPs_volume1/input/vanderbei_example14.1.txt",
+            "test_LPs_volume1/input/vanderbei_exercise2.1.txt",
+            "test_LPs_volume1/input/vanderbei_exercise2.2.txt",
+            "test_LPs_volume1/input/vanderbei_exercise2.3.txt",
+            "test_LPs_volume1/input/vanderbei_exercise2.4.txt",
+            "test_LPs_volume1/input/vanderbei_exercise2.5.txt",
+            "test_LPs_volume1/input/vanderbei_exercise2.6.txt",
+            "test_LPs_volume1/input/vanderbei_exercise2.7.txt",
+            "test_LPs_volume1/input/vanderbei_exercise2.8.txt",
+            "test_LPs_volume1/input/vanderbei_exercise2.9.txt",
+            "test_LPs_volume1/input/vanderbei_exercise2.10.txt",
+            "test_LPs_volume1/input/vanderbei_exercise2.11.txt",
+        ]
+
+        files_v2 = [
+            "test_LPs_volume2/input/infeasible_3x3_1.txt",
+            "test_LPs_volume2/input/infeasible_3x3_2.txt",
+            "test_LPs_volume2/input/infeasible_3x3_3.txt",
+            "test_LPs_volume2/input/infeasible_3x3_4.txt",
+            "test_LPs_volume2/input/infeasible_3x3_5.txt",
+            "test_LPs_volume2/input/infeasible_10x7_1.txt",
+            "test_LPs_volume2/input/infeasible_10x7_2.txt",
+            "test_LPs_volume2/input/infeasible_10x7_3.txt",
+            "test_LPs_volume2/input/infeasible_10x7_4.txt",
+            "test_LPs_volume2/input/infeasible_10x7_5.txt",
+            "test_LPs_volume2/input/optimal_3x3_1.txt",
+            "test_LPs_volume2/input/optimal_3x3_2.txt",
+            "test_LPs_volume2/input/optimal_3x3_3.txt",
+            "test_LPs_volume2/input/optimal_3x3_4.txt",
+            "test_LPs_volume2/input/optimal_3x3_5.txt",
+            "test_LPs_volume2/input/optimal_3x3_6.txt",
+            "test_LPs_volume2/input/optimal_3x3_7.txt",
+            "test_LPs_volume2/input/optimal_3x3_8.txt",
+            "test_LPs_volume2/input/optimal_3x3_9.txt",
+            "test_LPs_volume2/input/optimal_10x7_1.txt",
+            "test_LPs_volume2/input/optimal_10x7_2.txt",
+            "test_LPs_volume2/input/optimal_10x7_3.txt",
+            "test_LPs_volume2/input/optimal_10x7_4.txt",
+            "test_LPs_volume2/input/optimal_10x7_5.txt",
+            "test_LPs_volume2/input/optimal_10x7_6.txt",
+            "test_LPs_volume2/input/optimal_10x7_7.txt",
+            "test_LPs_volume2/input/optimal_10x7_8.txt",
+            "test_LPs_volume2/input/optimal_10x7_9.txt",
+            "test_LPs_volume2/input/unbounded_3x3_1.txt",
+            "test_LPs_volume2/input/unbounded_3x3_2.txt",
+            "test_LPs_volume2/input/unbounded_3x3_3.txt",
+            "test_LPs_volume2/input/unbounded_3x3_4.txt",
+            "test_LPs_volume2/input/unbounded_3x3_5.txt",
+            "test_LPs_volume2/input/unbounded_3x3_6.txt",
+            "test_LPs_volume2/input/unbounded_3x3_7.txt",
+            "test_LPs_volume2/input/unbounded_3x3_8.txt",
+            "test_LPs_volume2/input/unbounded_3x3_9.txt",
+            "test_LPs_volume2/input/unbounded_10x7_1.txt",
+            "test_LPs_volume2/input/unbounded_10x7_2.txt",
+            "test_LPs_volume2/input/unbounded_10x7_3.txt",
+            "test_LPs_volume2/input/unbounded_10x7_4.txt",
+            "test_LPs_volume2/input/unbounded_10x7_5.txt",
+            "test_LPs_volume2/input/unbounded_10x7_6.txt",
+            "test_LPs_volume2/input/unbounded_10x7_7.txt",
+            "test_LPs_volume2/input/unbounded_10x7_8.txt",
+            "test_LPs_volume2/input/unbounded_10x7_9.txt",
+        ]
+
+        for file_name in files_v1:
+            simplex_solver(file_name)
+
+        for file_name in files_v2:
+            simplex_solver(file_name)
+
     return 0
 
 
