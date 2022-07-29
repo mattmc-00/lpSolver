@@ -6,11 +6,18 @@
 How to run the solver:
 
 In the lpSolver directory, run the following command:
-'py main.py'
-The above command runs the solver on some of the less computationally expensive sample LPs.
+"py main.py"
 
-To run a specific LP, include its file path as an argument, for example:
-'py main.py "test_LPs_volume1/input/445k22_A1_juice.txt"'
+Then in standard input, provide the linear program in the standard encoding format with each line separated by '\n'.
+For example:
+
+To input the LP from '445k22_A1_juice.txt', input the following:
+"py main.py" <press enter>
+"13 12 9 \n 0.5 0.4 0.4 10 \n 0.3 0 0 5 \n 0.1 0.2 0.4 10 \n 0 0.3 0 1 \n 0 0.1 0.2 2" <press enter>
+
+To input the LP from 'vanderbei_example2.1.txt', input the following:
+"py main.py" <press enter>
+"5	4	3\n2	3	1	5\n4	1	2	11\n3	4	2	8"
 
 The results of the solver are displayed in standard output.
 

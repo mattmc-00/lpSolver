@@ -207,17 +207,17 @@ def dual_simplex(a, b, c, B, N):
         N.remove(j)
 
 
-def simplex_solver(file_path):
-    with open(file_path) as input_file:
-        input_data = input_file.read()
-    input_list = []
-
-    for row in input_data.splitlines():
-        curr_row = []
-        row_values = row.split()
-        for value in row_values:
-            curr_row.append(fr.Fraction(value))
-        input_list.append(curr_row)
+def simplex_solver(input_list):
+    # with open(file_path) as input_file:
+    #     input_data = input_file.read()
+    # input_list = []
+    #
+    # for row in input_data.splitlines():
+    #     curr_row = []
+    #     row_values = row.split()
+    #     for value in row_values:
+    #         curr_row.append(fr.Fraction(value))
+    #     input_list.append(curr_row)
 
     variables = len(input_list[0])
     constraints = len(input_list) - 1
@@ -296,109 +296,39 @@ def simplex_solver(file_path):
         print(" ".join(solutions))
 
 
+def read_input(input_string):
+    with open(input_string) as input_file:
+        input_data = input_file.read()
+    input_list = []
+    print(input_list)
+
+
 def main():
     '''
-    You can run this script on the 2 volumes of sample LPs, or enter the
-    path to an LP as an argument when running this script.
-
-    As this solution is not the most efficient, I've commented out
-    some of the slower problems in volume 1. Simply uncomment whichever LPs
-    you'd like to solve.
+    See the README.txt file to see how to input a linear program
+    with this solver. Input is provided with the format specified
+    in the programming assignment specification document, with each
+    line separated by '\n'.
     '''
 
-    if len(sys.argv) > 1:
-        for i in range(1, len(sys.argv)):
-            simplex_solver(sys.argv[i])
-    else:
-        files_v1 = [
-            "test_LPs_volume1/input/445k22_A1_juice.txt",
-            "test_LPs_volume1/input/445k22_Lecture01_bakery.txt",
-            # "test_LPs_volume1/input/netlib_adlittle.txt",
-            # "test_LPs_volume1/input/netlib_afiro.txt",
-            # "test_LPs_volume1/input/netlib_bgprtr.txt",
-            # "test_LPs_volume1/input/netlib_itest2.txt",
-            # "test_LPs_volume1/input/netlib_itest6.txt",
-            # "test_LPs_volume1/input/netlib_klein1.txt",
-            # "test_LPs_volume1/input/netlib_klein2.txt",
-            # "test_LPs_volume1/input/netlib_sc50a.txt",
-            # "test_LPs_volume1/input/netlib_sc50b.txt",
-            # "test_LPs_volume1/input/netlib_sc105.txt",
-            # "test_LPs_volume1/input/netlib_scagr7.txt",
-            # "test_LPs_volume1/input/netlib_share1b.txt",
-            # "test_LPs_volume1/input/netlib_share2b.txt",
-            # "test_LPs_volume1/input/netlib_stocfor1.txt",
-            "test_LPs_volume1/input/vanderbei_example2.1.txt",
-            "test_LPs_volume1/input/vanderbei_example3.6.txt",
-            "test_LPs_volume1/input/vanderbei_example5.6.txt",
-            "test_LPs_volume1/input/vanderbei_example6.3.txt",
-            "test_LPs_volume1/input/vanderbei_example14.1.txt",
-            "test_LPs_volume1/input/vanderbei_exercise2.1.txt",
-            "test_LPs_volume1/input/vanderbei_exercise2.2.txt",
-            "test_LPs_volume1/input/vanderbei_exercise2.3.txt",
-            "test_LPs_volume1/input/vanderbei_exercise2.4.txt",
-            "test_LPs_volume1/input/vanderbei_exercise2.5.txt",
-            "test_LPs_volume1/input/vanderbei_exercise2.6.txt",
-            "test_LPs_volume1/input/vanderbei_exercise2.7.txt",
-            "test_LPs_volume1/input/vanderbei_exercise2.8.txt",
-            "test_LPs_volume1/input/vanderbei_exercise2.9.txt",
-            "test_LPs_volume1/input/vanderbei_exercise2.10.txt",
-            "test_LPs_volume1/input/vanderbei_exercise2.11.txt",
-        ]
+    raw_input_data = input()
+    input_line_list = raw_input_data.split('\\n')
+    input_lines = []
+    for line in input_line_list:
+        for character in line:
+            if character.isdigit():
+                input_lines.append(line)
+                break
 
-        files_v2 = [
-            "test_LPs_volume2/input/infeasible_3x3_1.txt",
-            "test_LPs_volume2/input/infeasible_3x3_2.txt",
-            "test_LPs_volume2/input/infeasible_3x3_3.txt",
-            "test_LPs_volume2/input/infeasible_3x3_4.txt",
-            "test_LPs_volume2/input/infeasible_3x3_5.txt",
-            "test_LPs_volume2/input/infeasible_10x7_1.txt",
-            "test_LPs_volume2/input/infeasible_10x7_2.txt",
-            "test_LPs_volume2/input/infeasible_10x7_3.txt",
-            "test_LPs_volume2/input/infeasible_10x7_4.txt",
-            "test_LPs_volume2/input/infeasible_10x7_5.txt",
-            "test_LPs_volume2/input/optimal_3x3_1.txt",
-            "test_LPs_volume2/input/optimal_3x3_2.txt",
-            "test_LPs_volume2/input/optimal_3x3_3.txt",
-            "test_LPs_volume2/input/optimal_3x3_4.txt",
-            "test_LPs_volume2/input/optimal_3x3_5.txt",
-            "test_LPs_volume2/input/optimal_3x3_6.txt",
-            "test_LPs_volume2/input/optimal_3x3_7.txt",
-            "test_LPs_volume2/input/optimal_3x3_8.txt",
-            "test_LPs_volume2/input/optimal_3x3_9.txt",
-            "test_LPs_volume2/input/optimal_10x7_1.txt",
-            "test_LPs_volume2/input/optimal_10x7_2.txt",
-            "test_LPs_volume2/input/optimal_10x7_3.txt",
-            "test_LPs_volume2/input/optimal_10x7_4.txt",
-            "test_LPs_volume2/input/optimal_10x7_5.txt",
-            "test_LPs_volume2/input/optimal_10x7_6.txt",
-            "test_LPs_volume2/input/optimal_10x7_7.txt",
-            "test_LPs_volume2/input/optimal_10x7_8.txt",
-            "test_LPs_volume2/input/optimal_10x7_9.txt",
-            "test_LPs_volume2/input/unbounded_3x3_1.txt",
-            "test_LPs_volume2/input/unbounded_3x3_2.txt",
-            "test_LPs_volume2/input/unbounded_3x3_3.txt",
-            "test_LPs_volume2/input/unbounded_3x3_4.txt",
-            "test_LPs_volume2/input/unbounded_3x3_5.txt",
-            "test_LPs_volume2/input/unbounded_3x3_6.txt",
-            "test_LPs_volume2/input/unbounded_3x3_7.txt",
-            "test_LPs_volume2/input/unbounded_3x3_8.txt",
-            "test_LPs_volume2/input/unbounded_3x3_9.txt",
-            "test_LPs_volume2/input/unbounded_10x7_1.txt",
-            "test_LPs_volume2/input/unbounded_10x7_2.txt",
-            "test_LPs_volume2/input/unbounded_10x7_3.txt",
-            "test_LPs_volume2/input/unbounded_10x7_4.txt",
-            "test_LPs_volume2/input/unbounded_10x7_5.txt",
-            "test_LPs_volume2/input/unbounded_10x7_6.txt",
-            "test_LPs_volume2/input/unbounded_10x7_7.txt",
-            "test_LPs_volume2/input/unbounded_10x7_8.txt",
-            "test_LPs_volume2/input/unbounded_10x7_9.txt",
-        ]
+    input_list = []
+    for row in input_lines:
+        curr_row = []
+        row_values = row.split()
+        for value in row_values:
+            curr_row.append(fr.Fraction(value))
+        input_list.append(curr_row)
 
-        for file_name in files_v1:
-            simplex_solver(file_name)
-
-        for file_name in files_v2:
-            simplex_solver(file_name)
+    simplex_solver(input_list)
 
     return 0
 
