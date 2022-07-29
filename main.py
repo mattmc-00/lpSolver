@@ -296,13 +296,6 @@ def simplex_solver(input_list):
         print(" ".join(solutions))
 
 
-def read_input(input_string):
-    with open(input_string) as input_file:
-        input_data = input_file.read()
-    input_list = []
-    print(input_list)
-
-
 def main():
     '''
     See the README.txt file to see how to input a linear program
@@ -323,6 +316,7 @@ def main():
     input_list = []
     for row in input_lines:
         curr_row = []
+        row = row.replace('\t', ' ')
         row_values = row.split()
         for value in row_values:
             curr_row.append(fr.Fraction(value))
